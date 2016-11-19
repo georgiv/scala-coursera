@@ -2,7 +2,6 @@ package funsets
 
 import org.scalatest.FunSuite
 
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
@@ -46,7 +45,6 @@ class FunSetSuite extends FunSuite {
   // test("adding ints") {
   //   assert(1 + 2 === 3)
   // }
-
 
   import FunSets._
 
@@ -98,17 +96,132 @@ class FunSetSuite extends FunSuite {
        * the test fails. This helps identifying which assertion failed.
        */
       assert(contains(s1, 1), "Singleton")
+      assert(contains(s2, 2), "Singleton")
+      assert(contains(s3, 3), "Singleton")
+      assert(!contains(s1, 18), "Singleton")
+      assert(!contains(s2, -3), "Singleton")
+      assert(!contains(s3, 6), "Singleton")
     }
   }
 
   test("union contains all elements of each set") {
     new TestSets {
-      val s = union(s1, s2)
-      assert(contains(s, 1), "Union 1")
-      assert(contains(s, 2), "Union 2")
-      assert(!contains(s, 3), "Union 3")
+      val u12 = union(s1, s2)
+      assert(contains(u12, 1), "Union 1")
+      assert(contains(u12, 2), "Union 2")
+      assert(!contains(u12, 3), "Union 3")
+
+      val u23 = union(s2, s3)
+      assert(!contains(u23, 1), "Union 1")
+      assert(contains(u23, 2), "Union 2")
+      assert(contains(u23, 3), "Union 3")
+
+      val u13 = union(s1, s3)
+      assert(contains(u13, 1), "Union 1")
+      assert(!contains(u13, 2), "Union 2")
+      assert(contains(u13, 3), "Union 3")
     }
   }
 
+  test("intersect contains all elements, which are present in both sets") {
+    new TestSets {
+      val u12 = union(s1, s2)
+      val u23 = union(s2, s3)
+      val u13 = union(s1, s3)
 
+      val i1 = intersect(u12, u13)
+      assert(contains(i1, 1), "Intersect 1")
+      assert(!contains(i1, 2), "Intersect 2")
+      assert(!contains(i1, 3), "Intersect 3")
+
+      val i2 = intersect(u12, u23)
+      assert(!contains(i2, 1), "Intersect 1")
+      assert(contains(i2, 2), "Intersect 2")
+      assert(!contains(i2, 3), "Intersect 3")
+
+      val i3 = intersect(u23, u13)
+      assert(!contains(i3, 1), "Intersect 1")
+      assert(!contains(i3, 2), "Intersect 2")
+      assert(contains(i3, 3), "Intersect 3")
+    }
+  }
+
+  test("diff contains all elements, which are present only in the first set") {
+    new TestSets {
+      val u12 = union(s1, s2)
+      val u23 = union(s2, s3)
+      val u13 = union(s1, s3)
+
+      val d1 = diff(u12, u13)
+      assert(!contains(d1, 1), "Diff 1")
+      assert(contains(d1, 2), "Diff 2")
+      assert(!contains(d1, 3), "Diff 3")
+
+      val d2 = diff(u13, u12)
+      assert(!contains(d2, 1), "Diff 1")
+      assert(!contains(d2, 2), "Diff 2")
+      assert(contains(d2, 3), "Diff 3")
+
+      val d3 = diff(u12, u23)
+      assert(contains(d3, 1), "Diff 1")
+      assert(!contains(d3, 2), "Diff 2")
+      assert(!contains(d3, 3), "Diff 3")
+
+      val d4 = diff(u23, u12)
+      assert(!contains(d4, 1), "Diff 1")
+      assert(!contains(d4, 2), "Diff 2")
+      assert(contains(d4, 3), "Diff 3")
+
+      val d5 = diff(u23, u13)
+      assert(!contains(d5, 1), "Diff 1")
+      assert(contains(d5, 2), "Diff 2")
+      assert(!contains(d5, 3), "Diff 3")
+
+      val d6 = diff(u13, u23)
+      assert(contains(d6, 1), "Diff 1")
+      assert(!contains(d6, 2), "Diff 2")
+      assert(!contains(d6, 3), "Diff 3")
+    }
+  }
+
+  test("filter contains all elements in a set, which satisfy given predicate") {
+    new TestSets {
+      val u = union(union(s1, s2), s3)
+      val f = filter(u, x => x < 3)
+      assert(contains(f, 1), "Filter 1")
+      assert(contains(f, 2), "Filter 2")
+      assert(!contains(f, 3), "Filter 3")
+    }
+  }
+
+  test("checks whether all elements in a set satisfy given predicate") {
+    new TestSets {
+      val s = union(s1, s2)
+      assert(forall(s, x => x < 3), "forall(1, 2) < 3")
+      assert(!forall(s, x => x < 2), "forall(1, 2) < 2")
+      assert(!forall(s, x => x < 1), "forall(1, 2) < 1")
+    }
+  }
+
+  test("checks whether at least one element in a set satisfies given predicate") {
+    new TestSets {
+      val s = union(s1, s2)
+      assert(exists(s, x => x < 3), "exists(1, 2) < 3")
+      assert(exists(s, x => x < 2), "exists(1, 2) < 2")
+      assert(!exists(s, x => x < 1), "exists(1, 2) < 1")
+    }
+  }
+
+  test("map contains all elements in a set after applying given function to each of them") {
+    new TestSets {
+      val m = map(union(s1, s3), x => x * 2)
+      assert(!contains(m, 1), "Map 1")
+      assert(contains(m, 2), "Map 2")
+      assert(!contains(m, 3), "Map 3")
+      assert(!contains(m, 4), "Map 4")
+      assert(!contains(m, 5), "Map 5")
+      assert(contains(m, 6), "Map 6")
+      
+    }
+  }
 }
