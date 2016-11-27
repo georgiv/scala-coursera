@@ -58,8 +58,6 @@ abstract class TweetSet {
    */
   def union(that: TweetSet): TweetSet
 
-  def isEmpty: Boolean
-
   /**
    * Returns the tweet from this set which has the greatest retweet count.
    *
@@ -82,10 +80,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = {
-    if (isEmpty) Nil
-    else new Cons(mostRetweeted, remove(mostRetweeted).descendingByRetweet)
-  }
+  def descendingByRetweet: TweetList
 
   /**
    * The following methods are already implemented
@@ -120,11 +115,11 @@ class Empty extends TweetSet {
 
   def union(that: TweetSet): TweetSet = that
 
-  def isEmpty = true;
-
   def mostRetweeted: Tweet = throw new NoSuchElementException
 
   def mostRetweetedAcc(acc: Tweet) = acc
+
+  def descendingByRetweet = Nil
 
   /**
    * The following methods are already implemented
@@ -150,8 +145,6 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def union(that: TweetSet): TweetSet = right.union(left.union(that.incl(elem)))
 
-  def isEmpty = false
-
   def mostRetweeted: Tweet = mostRetweetedAcc(elem)
 
   def mostRetweetedAcc(acc: Tweet): Tweet = {
@@ -160,6 +153,8 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     else
       right.mostRetweetedAcc(left.mostRetweetedAcc(acc))
   }
+
+  def descendingByRetweet: TweetList = new Cons(mostRetweeted, remove(mostRetweeted).descendingByRetweet)
 
   /**
    * The following methods are already implemented
