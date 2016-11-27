@@ -26,11 +26,14 @@ object Main {
     def balance(chars: List[Char]): Boolean = {
       @tailrec
       def iterate(c: Int, remainder: List[Char]): Boolean = {
-        if (c < 0) return false
-        if (remainder.isEmpty) (c == 0)
-        else if (remainder.head == '(') iterate(c + 1, remainder.tail)
-        else if (remainder.head == ')') iterate(c - 1, remainder.tail)
-        else iterate(c, remainder.tail)
+        if (c < 0)
+          false
+        else {
+          if (remainder.isEmpty) (c == 0)
+          else if (remainder.head == '(') iterate(c + 1, remainder.tail)
+          else if (remainder.head == ')') iterate(c - 1, remainder.tail)
+          else iterate(c, remainder.tail)
+        }
       }
       iterate(0, chars)
     }
