@@ -18,26 +18,23 @@ object Huffman {
    * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
    * leaves.
    */
-    abstract class CodeTree
+  abstract class CodeTree
   case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
   case class Leaf(char: Char, weight: Int) extends CodeTree
-  
 
   // Part 1: Basics
-    def weight(tree: CodeTree): Int = tree match { 
-      case Fork(left, right, chars, weight) => weight
-      case Leaf(char, weight) => weight
-    }
-  
-    def chars(tree: CodeTree): List[Char] = tree match {
-      case Fork(left, right, chars, weight) => chars
-      case Leaf(char, weight) => List(char)
-    }
-  
+  def weight(tree: CodeTree): Int = tree match { 
+    case Fork(left, right, chars, weight) => weight
+    case Leaf(char, weight) => weight
+  }
+
+  def chars(tree: CodeTree): List[Char] = tree match {
+    case Fork(left, right, chars, weight) => chars
+    case Leaf(char, weight) => List(char)
+  }
+
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
-
-
 
   // Part 2: Generating Huffman trees
 
@@ -75,7 +72,12 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-    def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    def timesInternal(remainder: List[Char], timesList: List[(Char, Int)]): List[(Char, Int)] = {
+      ???
+    }
+    timesInternal(chars.tail, Nil)
+  }
   
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
