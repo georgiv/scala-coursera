@@ -12,19 +12,24 @@ class HuffmanSuite extends FunSuite {
 	trait TestTrees {
 		val t1 = Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5)
 		val t2 = Fork(Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5), Leaf('d',4), List('a','b','d'), 9)
+		val t3 = makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(Leaf('a', 8), Leaf('b', 3)), Leaf('c', 1)), Leaf('d', 1)), Leaf('e',1 )), Leaf('f',1 )), Leaf('g', 1)), Leaf('h', 1))
 	}
 
 
   test("weight of a larger tree") {
     new TestTrees {
       assert(weight(t1) === 5)
+      assert(weight(t2) === 9)
+      assert(weight(t3) === 17)
     }
   }
 
 
   test("chars of a larger tree") {
     new TestTrees {
+      assert(chars(t1) === List('a','b'))
       assert(chars(t2) === List('a','b','d'))
+      assert(chars(t3) === List('a','b','c', 'd', 'e', 'f', 'g', 'h'))
     }
   }
 
