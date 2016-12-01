@@ -124,15 +124,6 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-//    def combine(trees: List[CodeTree]): List[CodeTree] = {
-//      def combineTwoTrees(left: CodeTree, right: CodeTree) = makeCodeTree(left, right)
-//      def insert(tree: CodeTree, trees: List[CodeTree]):List[CodeTree] = trees match {
-//        case List() => List(tree)
-//        case h::t => if (weight(tree) <= weight(h)) tree::trees else h::insert(tree, t)
-//      }
-//      if (singleton(trees)) trees
-//      else combine(insert(combineTwoTrees(trees.head, trees.tail.head), trees.tail.tail))
-//    }
   def combine(trees: List[CodeTree]): List[CodeTree] = {
     def combineTwoTrees(left: CodeTree, right: CodeTree) = makeCodeTree(left, right)
     def insert(tree: CodeTree, trees: List[CodeTree]):List[CodeTree] = trees match {
