@@ -14,6 +14,8 @@ class HuffmanSuite extends FunSuite {
     val t2 = Fork(Fork(Leaf('a',2), Leaf('b',3), List('a','b'), 5), Leaf('d',4), List('a','b','d'), 9)
     val t3 = makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(makeCodeTree(Leaf('a', 8), Leaf('b', 3)), Leaf('c', 1)), Leaf('d', 1)), Leaf('e',1 )), Leaf('f',1 )), Leaf('g', 1)), Leaf('h', 1))
     val t4 = List(Leaf('d', 1), Leaf('r', 1), Leaf('w', 1), Leaf('e', 1), Leaf('h', 1), Leaf('o', 2), Leaf('l', 3))
+    val t5 = createCodeTree("hello, world!".toList)
+    val t6 = createCodeTree("someText".toList)
   }
 
   test("weight of a larger tree") {
@@ -39,7 +41,7 @@ class HuffmanSuite extends FunSuite {
   test("times") {
     assert(times(string2Chars("a")) === List(('a', 1)))
     assert(times(string2Chars("aaaaabaaaaa")) === List(('b', 1), ('a', 10)))
-    assert(times(string2Chars("hello, world")) === List(('d', 1), ('r', 1), ('w', 1), ('o', 2), ('l', 3), ('e', 1), ('h', 1)))
+    assert(times(string2Chars("hello, world")) === List(('d', 1), ('r', 1), ('w', 1), (' ', 1), (',', 1), ('o', 2), ('l', 3), ('e', 1), ('h', 1)))
   }
 
   test("makeOrderedLeafList for some frequency table") {
@@ -76,12 +78,14 @@ class HuffmanSuite extends FunSuite {
   }
 
   test("createCodeTree") {
-    assert(createCodeTree(string2Chars("hello, world")) === Fork(Fork(Fork(Leaf('d', 1), Leaf('r', 1), List('d', 'r'), 2), Leaf('o', 2), List('d', 'r', 'o'), 4), Fork(Fork(Leaf('h', 1), Fork(Leaf('w', 1), Leaf('e', 1), List('w', 'e'), 2), List('h', 'w', 'e'), 3), Leaf('l', 3), List('h', 'w', 'e', 'l'), 6), List('d', 'r', 'o', 'h', 'w', 'e', 'l'), 10))
+    assert(createCodeTree(string2Chars("helloworld")) === Fork(Fork(Fork(Leaf('d', 1), Leaf('r', 1), List('d', 'r'), 2), Leaf('o', 2), List('d', 'r', 'o'), 4), Fork(Fork(Leaf('h', 1), Fork(Leaf('w', 1), Leaf('e', 1), List('w', 'e'), 2), List('h', 'w', 'e'), 3), Leaf('l', 3), List('h', 'w', 'e', 'l'), 6), List('d', 'r', 'o', 'h', 'w', 'e', 'l'), 10))
   }
 
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
+      assert(decode(t5, encode(t5)("hello, world!".toList)) === "hello, world!".toList)
+      assert(decode(t6, encode(t6)("someText".toList)) === "someText".toList)
     }
   }
 }
