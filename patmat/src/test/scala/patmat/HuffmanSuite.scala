@@ -88,4 +88,32 @@ class HuffmanSuite extends FunSuite {
       assert(decode(t6, encode(t6)("someText".toList)) === "someText".toList)
     }
   }
+
+  test("mergeCodeTables") {
+    assert(mergeCodeTables(Nil, Nil) === Nil)
+    assert(mergeCodeTables(List(('a', List(0, 1, 0))), Nil) === List(('a', List(0, 1, 0))))
+    assert(mergeCodeTables(List(('a', List(0, 1, 0)), ('d', List(1)), ('b', List(0, 0))), List(('c', List(0)), ('z', List(1, 1, 0)))) === List(('a', List(0, 1, 0)), ('d', List(1)), ('b', List(0, 0)), ('c', List(0)), ('z', List(1, 1, 0))))
+  }
+
+  test("convert") {
+    new TestTrees {
+      assert(convert(t1) === List(('a', List(0)), ('b', List(1))))
+      assert(convert(t2) === List(('a', List(0, 0)), ('b', List(0, 1)), ('d', List(1))))
+    }
+  }
+
+  test("codeBits") {
+    val table = ('a', List(0, 1, 0))::('f', List(1, 0, 1))::('z', List(0, 1, 1))::Nil
+    assert(codeBits(table)('a') == List(0, 1, 0))
+    assert(codeBits(table)('f') == List(1, 0, 1))
+    assert(codeBits(table)('z') == List(0, 1, 1))
+  }
+
+  test("quickEncode") {
+    new TestTrees {
+      assert(decode(t1, quickEncode(t1)("ab".toList)) === "ab".toList)
+      assert(decode(t5, quickEncode(t5)("hello, world!".toList)) === "hello, world!".toList)
+      assert(decode(t6, quickEncode(t6)("someText".toList)) === "someText".toList)
+    }
+  }
 }

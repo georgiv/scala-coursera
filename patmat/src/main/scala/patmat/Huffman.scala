@@ -178,10 +178,10 @@ object Huffman {
       case Fork(left, right, chars, weight) => if (bits.head == 0) decodeChar(left, bits.tail, depth + 1) else decodeChar(right, bits.tail, depth + 1)
     }
     def accumulator(tree: CodeTree, bits: List[Bit], message: List[Char]): List[Char] = {
-      if (bits.isEmpty) message.reverse
+      if (bits.isEmpty) message
       else {
         val nextDecoded = decodeChar(tree, bits, 0)
-        accumulator(tree, bits.takeRight(bits.size - nextDecoded._2), nextDecoded._1::message)
+        accumulator(tree, bits.takeRight(bits.size - nextDecoded._2), message:::List(nextDecoded._1))
       }
     }
     accumulator(tree, bits, Nil)
@@ -214,11 +214,11 @@ object Huffman {
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
     def traverse(tree: CodeTree, char: Char, bits: List[Bit]): List[Bit] = tree match {
       case Leaf(foundChar, _) => if (foundChar == char) bits else Nil
-      case Fork(left, right, chars, _) => if (chars.contains(char)) traverse(left, char, 0::bits):::traverse(right, char, 1::bits) else Nil
+      case Fork(left, right, chars, _) => if (chars.contains(char)) traverse(left, char, bits:::List(0)):::traverse(right, char, bits:::List(1)) else Nil
     }
     def accumulator(tree: CodeTree, text: List[Char], bits: List[Bit]): List[Bit] = {
-      if (text.isEmpty) bits.reverse
-      else accumulator(tree, text.tail, traverse(tree, text.head, Nil):::bits)
+      if (text.isEmpty) bits
+      else accumulator(tree, text.tail, bits:::traverse(tree, text.head, Nil))
     }
     accumulator(tree, text, Nil)
   }
@@ -231,7 +231,7 @@ object Huffman {
    * This function returns the bit sequence that represents the character `char` in
    * the code table `table`.
    */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = table.find(_._1 == char).get._2
 
   /**
    * Given a code tree, create a code table which contains, for every character in the
@@ -241,14 +241,20 @@ object Huffman {
    * a valid code tree that can be represented as a code table. Using the code tables of the
    * sub-trees, think of how to build the code table for the entire tree.
    */
-  def convert(tree: CodeTree): CodeTable = ???
+  def convert(tree: CodeTree): CodeTable = {
+    def merger(tree: CodeTree, bits: List[Bit]): CodeTable = tree match {
+      case Leaf(char, _) => (char, bits)::Nil
+      case Fork(left, right, _, _) => mergeCodeTables(merger(left, bits:::List(0)), merger(right, bits:::List(1)))
+    }
+    merger(tree, Nil)
+  }
 
   /**
    * This function takes two code tables and merges them into one. Depending on how you
    * use it in the `convert` method above, this merge method might also do some transformations
    * on the two parameter code tables.
    */
-  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = a:::b
 
   /**
    * This function encodes `text` according to the code tree `tree`.
@@ -256,5 +262,11 @@ object Huffman {
    * To speed up the encoding process, it first converts the code tree to a code table
    * and then uses it to perform the actual encoding.
    */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    def codeTableEncode(table: CodeTable, text: List[Char], bits: List[Bit]): List[Bit] = {
+      if (text.isEmpty) bits
+      else codeTableEncode(table, text.tail, bits:::codeBits(table)(text.head))
+    }
+    codeTableEncode(convert(tree), text, Nil)
+  }
 }
