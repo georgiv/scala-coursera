@@ -24,13 +24,13 @@ object Huffman {
 
   // Part 1: Basics
   def weight(tree: CodeTree): Int = tree match { 
-    case Fork(left, right, chars, weight) => weight
-    case Leaf(char, weight) => weight
+    case Fork(_, _, _, weight) => weight
+    case Leaf(_, weight) => weight
   }
 
   def chars(tree: CodeTree): List[Char] = tree match {
-    case Fork(left, right, chars, weight) => chars
-    case Leaf(char, weight) => List(char)
+    case Fork(_, _, chars, _) => chars
+    case Leaf(char, _) => List(char)
   }
 
   def makeCodeTree(left: CodeTree, right: CodeTree) =
@@ -73,15 +73,14 @@ object Huffman {
    *   }
    */
   def times(chars: List[Char]): List[(Char, Int)] = {
-    def countChar(char: Char, remainder: List[Char], occurences: Int): Int =  remainder match {
-      case List() => occurences
-      case h::t => if (h == char) countChar(char, t, occurences + 1) else countChar(char, t, occurences)
+    def timesInternal(chars: List[Char], occurrences: List[(Char, Int)]): List[(Char, Int)] = chars match {
+      case Nil => occurrences
+      case h::t => {
+        val (first, rest)  = chars span (x => x == h)
+        timesInternal(rest, (h, first.length)::occurrences)
+      }
     }
-    def add(remainder: List[Char], timesList: List[(Char, Int)]): List[(Char, Int)] = remainder match {
-      case List() => timesList
-      case h::t => if (timesList.find(_._1 == h).isEmpty) add(t, (h, countChar(h, remainder, 0))::timesList) else add(t, timesList)
-    }
-    add(chars, Nil)
+    timesInternal(chars.sorted, Nil)
   }
 
   /**
@@ -91,18 +90,8 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs.sortBy(x => x._2).map(x => Leaf(x._1, x._2))
 
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
-    def insert(entry: (Char, Int), ordered: List[(Leaf)]): List[Leaf] = ordered match {
-      case List() => List(Leaf(entry._1, entry._2))
-      case h::t => if (entry._2 <= h.weight) Leaf(entry._1, entry._2)::ordered else h::insert(entry, t)
-    }
-    def sort(unordered: List[(Char, Int)]): List[Leaf] = unordered match {
-      case List() => List()
-      case h::t => insert(h, sort(t))
-    }
-    sort(freqs)
-  }
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
@@ -125,13 +114,12 @@ object Huffman {
    * unchanged.
    */
   def combine(trees: List[CodeTree]): List[CodeTree] = {
-    def combineTwoTrees(left: CodeTree, right: CodeTree) = makeCodeTree(left, right)
     def insert(tree: CodeTree, trees: List[CodeTree]):List[CodeTree] = trees match {
       case List() => List(tree)
       case h::t => if (weight(tree) <= weight(h)) tree::trees else h::insert(tree, t)
     }
-    if (trees.size < 2) trees
-    else insert(combineTwoTrees(trees.head, trees.tail.head), trees.tail.tail)
+    if (trees.length < 2) trees
+    else insert(makeCodeTree(trees(0), trees(1)), trees.drop(2))
   }
   
   /**

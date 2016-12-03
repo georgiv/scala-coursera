@@ -41,7 +41,7 @@ class HuffmanSuite extends FunSuite {
   test("times") {
     assert(times(string2Chars("a")) === List(('a', 1)))
     assert(times(string2Chars("aaaaabaaaaa")) === List(('b', 1), ('a', 10)))
-    assert(times(string2Chars("hello, world")) === List(('d', 1), ('r', 1), ('w', 1), (' ', 1), (',', 1), ('o', 2), ('l', 3), ('e', 1), ('h', 1)))
+    assert(times(string2Chars("hello, world")) === List(('w', 1), ('r', 1), ('o', 2), ('l', 3), ('h', 1), ('e', 1), ('d', 1), (',', 1), (' ', 1)))
   }
 
   test("makeOrderedLeafList for some frequency table") {
@@ -75,10 +75,6 @@ class HuffmanSuite extends FunSuite {
       assert(until(combine, singleton)(List(Leaf('a', 1), Leaf('z', 16))) === List(Fork(Leaf('a', 1), Leaf('z', 16), List('a', 'z'), 17)))
       assert(until(combine, singleton)(t4) === List(Fork(Fork(Fork(Leaf('d', 1), Leaf('r', 1), List('d', 'r'), 2), Leaf('o', 2), List('d', 'r', 'o'), 4), Fork(Fork(Leaf('h', 1), Fork(Leaf('w', 1), Leaf('e', 1), List('w', 'e'), 2), List('h', 'w', 'e'), 3), Leaf('l', 3), List('h', 'w', 'e', 'l'), 6), List('d', 'r', 'o', 'h', 'w', 'e', 'l'), 10)))
     }
-  }
-
-  test("createCodeTree") {
-    assert(createCodeTree(string2Chars("helloworld")) === Fork(Fork(Fork(Leaf('d', 1), Leaf('r', 1), List('d', 'r'), 2), Leaf('o', 2), List('d', 'r', 'o'), 4), Fork(Fork(Leaf('h', 1), Fork(Leaf('w', 1), Leaf('e', 1), List('w', 'e'), 2), List('h', 'w', 'e'), 3), Leaf('l', 3), List('h', 'w', 'e', 'l'), 6), List('d', 'r', 'o', 'h', 'w', 'e', 'l'), 10))
   }
 
   test("decode and encode a very short text should be identity") {
