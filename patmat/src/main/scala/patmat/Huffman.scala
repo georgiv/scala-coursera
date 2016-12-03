@@ -90,7 +90,7 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs.sortBy(x => x._2).map(x => Leaf(x._1, x._2))
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs.sortBy(_._2).map(x => Leaf(x._1, x._2))
 
 
   /**
@@ -113,14 +113,9 @@ object Huffman {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = {
-    def insert(tree: CodeTree, trees: List[CodeTree]):List[CodeTree] = trees match {
-      case List() => List(tree)
-      case h::t => if (weight(tree) <= weight(h)) tree::trees else h::insert(tree, t)
-    }
-    if (trees.length < 2) trees
-    else insert(makeCodeTree(trees(0), trees(1)), trees.drop(2))
-  }
+  def combine(trees: List[CodeTree]): List[CodeTree] = 
+    if (trees.length < 2) trees 
+    else (makeCodeTree(trees(0), trees(1))::trees.drop(2)).sortBy(weight(_))
   
   /**
    * This function will be called in the following way:
@@ -162,14 +157,14 @@ object Huffman {
    */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
     def decodeChar(tree: CodeTree, bits: List[Bit], depth: Int): (Char, Int) = tree match {
-      case Leaf(char, weight) => (char, depth)
-      case Fork(left, right, chars, weight) => if (bits.head == 0) decodeChar(left, bits.tail, depth + 1) else decodeChar(right, bits.tail, depth + 1)
+      case Leaf(char, _) => (char, depth)
+      case Fork(left, right, _, _) => if (bits.head == 0) decodeChar(left, bits.tail, depth + 1) else decodeChar(right, bits.tail, depth + 1)
     }
     def accumulator(tree: CodeTree, bits: List[Bit], message: List[Char]): List[Char] = {
       if (bits.isEmpty) message
       else {
         val nextDecoded = decodeChar(tree, bits, 0)
-        accumulator(tree, bits.takeRight(bits.size - nextDecoded._2), message:::List(nextDecoded._1))
+        accumulator(tree, bits.drop(nextDecoded._2), message ++ List(nextDecoded._1))
       }
     }
     accumulator(tree, bits, Nil)
