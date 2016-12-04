@@ -156,18 +156,13 @@ object Huffman {
    * the resulting list of characters.
    */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
-    def decodeChar(tree: CodeTree, bits: List[Bit], depth: Int): (Char, Int) = tree match {
-      case Leaf(char, _) => (char, depth)
-      case Fork(left, right, _, _) => if (bits.head == 0) decodeChar(left, bits.tail, depth + 1) else decodeChar(right, bits.tail, depth + 1)
+    def decodeInternal(current: CodeTree, remainder: List[Bit], message: List[Char]): List[Char] = current match {
+      case Leaf(char, _) => if (remainder.isEmpty) message ++ List(char)
+                            else decodeInternal(tree, remainder, message ++ List(char))
+      case Fork(left, right, chars, _) => if (remainder.head == 0) decodeInternal(left, remainder.tail, message)
+                                          else decodeInternal(right, remainder.tail, message)
     }
-    def accumulator(tree: CodeTree, bits: List[Bit], message: List[Char]): List[Char] = {
-      if (bits.isEmpty) message
-      else {
-        val nextDecoded = decodeChar(tree, bits, 0)
-        accumulator(tree, bits.drop(nextDecoded._2), message ++ List(nextDecoded._1))
-      }
-    }
-    accumulator(tree, bits, Nil)
+    decodeInternal(tree, bits, Nil)
   }
 
   /**
