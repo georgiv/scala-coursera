@@ -73,14 +73,14 @@ object Huffman {
    *   }
    */
   def times(chars: List[Char]): List[(Char, Int)] = {
-    def timesInternal(chars: List[Char], occurrences: List[(Char, Int)]): List[(Char, Int)] = chars match {
+    def count(chars: List[Char], occurrences: List[(Char, Int)]): List[(Char, Int)] = chars match {
       case Nil => occurrences
       case h::t => {
         val (first, rest)  = chars span (x => x == h)
-        timesInternal(rest, (h, first.length)::occurrences)
+        count(rest, (h, first.length)::occurrences)
       }
     }
-    timesInternal(chars.sorted, Nil)
+    count(chars.sorted, Nil)
   }
 
   /**
@@ -156,13 +156,13 @@ object Huffman {
    * the resulting list of characters.
    */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
-    def decodeInternal(current: CodeTree, remainder: List[Bit], message: List[Char]): List[Char] = current match {
-      case Leaf(char, _) => if (remainder.isEmpty) message ++ List(char)
-                            else decodeInternal(tree, remainder, message ++ List(char))
-      case Fork(left, right, chars, _) => if (remainder.head == 0) decodeInternal(left, remainder.tail, message)
-                                          else decodeInternal(right, remainder.tail, message)
+    def traverse(current: CodeTree, remainder: List[Bit], decoded: List[Char]): List[Char] = current match {
+      case Leaf(char, _) => if (remainder.isEmpty) decoded ++ List(char)
+                            else traverse(tree, remainder, decoded ++ List(char))
+      case Fork(left, right, chars, _) => if (remainder.head == 0) traverse(left, remainder.tail, decoded)
+                                          else traverse(right, remainder.tail, decoded)
     }
-    decodeInternal(tree, bits, Nil)
+    traverse(tree, bits, Nil)
   }
 
   /**
@@ -190,15 +190,13 @@ object Huffman {
    * into a sequence of bits.
    */
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
-    def traverse(tree: CodeTree, char: Char, bits: List[Bit]): List[Bit] = tree match {
-      case Leaf(foundChar, _) => if (foundChar == char) bits else Nil
-      case Fork(left, right, chars, _) => if (chars.contains(char)) traverse(left, char, bits:::List(0)):::traverse(right, char, bits:::List(1)) else Nil
+    def traverse(current: CodeTree, remainder: List[Char], encoded: List[Bit]): List[Bit] = (current, remainder) match {
+      case (_, Nil) => encoded
+      case (Leaf(_, _), _) => traverse(tree, remainder.tail, encoded)
+      case (Fork(left, right, _, _), _) => if (chars(left).contains(remainder.head)) traverse(left, remainder, encoded ++ List(0))
+                                                   else traverse(right, remainder, encoded ++ List(1))
     }
-    def accumulator(tree: CodeTree, text: List[Char], bits: List[Bit]): List[Bit] = {
-      if (text.isEmpty) bits
-      else accumulator(tree, text.tail, bits:::traverse(tree, text.head, Nil))
-    }
-    accumulator(tree, text, Nil)
+    traverse(tree, text, Nil)
   }
 
   // Part 4b: Encoding using code table
