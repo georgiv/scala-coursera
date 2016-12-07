@@ -153,6 +153,14 @@ object Anagrams {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    List(List())
+    ???
   }
+//  def sentenceAnagrams(s: Sentence): List[Sentence] = {
+//    def h(xs: Occurrences): Iterable[Word] = dictionaryByOccurrences.get(xs).flatten
+//    def f(xs: Occurrences): List[Sentence] = xs match {
+//      case Nil => List(Nil)
+//      case _ => combinations(xs) flatMap (c => h(c) flatMap (w => f(subtract(xs,c)).map(w :: _)))
+//    }
+//    f(sentenceOccurrences(s))
+//  }
 }
