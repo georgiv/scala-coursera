@@ -25,8 +25,8 @@ class BloxorzSuite extends FunSuite {
           case Up => block.up
           case Down => block.down
         }
+      }
     }
-  }
 
   trait Level1 extends SolutionChecker {
       /* terrain for level 1*/
@@ -42,8 +42,7 @@ class BloxorzSuite extends FunSuite {
     val optsolution = List(Right, Right, Down, Right, Right, Right, Down)
   }
 
-
-	test("terrain function level 1") {
+  test("terrain function level 1") {
     new Level1 {
       assert(terrain(Pos(0,0)), "0,0")
       assert(terrain(Pos(1,1)), "1,1") // start
@@ -58,24 +57,21 @@ class BloxorzSuite extends FunSuite {
     }
   }
 
-	test("findChar level 1") {
+  test("findChar level 1") {
     new Level1 {
       assert(startPos == Pos(1,1))
     }
   }
 
-
-	test("optimal solution for level 1") {
+  test("optimal solution for level 1") {
     new Level1 {
       assert(solve(solution) == Block(goal, goal))
     }
   }
 
-
-	test("optimal solution length for level 1") {
+  test("optimal solution length for level 1") {
     new Level1 {
       assert(solution.length == optsolution.length)
     }
   }
-
 }

@@ -60,7 +60,6 @@ trait GameDef {
    */
   type Terrain = Pos => Boolean
 
-
   /**
    * The terrain of this game. This value is left abstract.
    */
@@ -81,8 +80,7 @@ trait GameDef {
    * This function returns the block at the start position of
    * the game.
    */
-  def startBlock: Block = ???
-
+  def startBlock: Block = Block(startPos, startPos)
 
   /**
    * A block is represented by the position of the two cubes that
@@ -106,7 +104,6 @@ trait GameDef {
      */
     def deltaCol(d1: Int, d2: Int) = Block(b1.deltaCol(d1), b2.deltaCol(d2))
 
-
     /** The block obtained by moving left */
     def left = if (isStanding)             deltaCol(-2, -1)
                else if (b1.row == b2.row)  deltaCol(-1, -2)
@@ -127,7 +124,6 @@ trait GameDef {
                else if (b1.row == b2.row)  deltaRow(1, 1)
                else                        deltaRow(2, 1)
 
-
     /**
      * Returns the list of blocks that can be obtained by moving
      * the current block, together with the corresponding move.
@@ -143,11 +139,11 @@ trait GameDef {
     /**
      * Returns `true` if the block is standing.
      */
-    def isStanding: Boolean = ???
+    def isStanding: Boolean = b1 == b2
 
     /**
      * Returns `true` if the block is entirely inside the terrain.
      */
-    def isLegal: Boolean = ???
+    def isLegal: Boolean = terrain(b1) && terrain(b2)
   }
 }
