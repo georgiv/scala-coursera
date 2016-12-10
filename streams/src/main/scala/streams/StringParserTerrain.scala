@@ -1,7 +1,6 @@
 package streams
 
 import common._
-import org.scalatest.enablers.Length
 
 /**
  * This component implements a parser to define terrains from a
